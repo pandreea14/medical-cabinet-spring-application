@@ -47,7 +47,6 @@ class PatientServiceTest {
     @Test
     @DisplayName("Create patient - should save and return patient successfully")
     void create_ShouldSaveAndReturnPatient() {
-        // Given
         Patient newPatient = Patient.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -58,10 +57,8 @@ class PatientServiceTest {
 
         when(patientRepository.save(any(Patient.class))).thenReturn(testPatient);
 
-        // When
         Patient result = patientService.create(newPatient);
 
-        // Then
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals("John", result.getFirstName());
@@ -73,7 +70,6 @@ class PatientServiceTest {
     @Test
     @DisplayName("Create patient with null - should throw IllegalArgumentException")
     void create_WithNull_ShouldThrowIllegalArgumentException() {
-        // When & Then
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> patientService.create(null)
@@ -86,7 +82,6 @@ class PatientServiceTest {
     @Test
     @DisplayName("Get all patients - should return list of all patients")
     void getAll_ShouldReturnAllPatients() {
-        // Given
         Patient patient2 = Patient.builder()
                 .id(2)
                 .firstName("Jane")
@@ -99,10 +94,8 @@ class PatientServiceTest {
         List<Patient> patients = Arrays.asList(testPatient, patient2);
         when(patientRepository.findAll()).thenReturn(patients);
 
-        // When
         List<Patient> result = patientService.getAll();
 
-        // Then
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("John", result.get(0).getFirstName());
@@ -113,13 +106,10 @@ class PatientServiceTest {
     @Test
     @DisplayName("Get all patients - should return empty list when no patients exist")
     void getAll_ShouldReturnEmptyList_WhenNoPatientsExist() {
-        // Given
         when(patientRepository.findAll()).thenReturn(new ArrayList<>());
 
-        // When
         List<Patient> result = patientService.getAll();
 
-        // Then
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(patientRepository, times(1)).findAll();
@@ -128,13 +118,10 @@ class PatientServiceTest {
     @Test
     @DisplayName("Get patient by ID - should return patient when found")
     void getById_ShouldReturnPatient_WhenPatientExists() {
-        // Given
         when(patientRepository.findById(1)).thenReturn(Optional.of(testPatient));
 
-        // When
         Patient result = patientService.getById(1);
 
-        // Then
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals("John", result.getFirstName());
@@ -146,10 +133,8 @@ class PatientServiceTest {
     @Test
     @DisplayName("Get patient by ID - should throw PatientNotFroundException when not found")
     void getById_ShouldThrowPatientNotFoundException_WhenPatientNotFound() {
-        // Given
         when(patientRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(PatientNotFroundException.class, () -> patientService.getById(999));
         verify(patientRepository, times(1)).findById(999);
     }
@@ -157,7 +142,6 @@ class PatientServiceTest {
     @Test
     @DisplayName("Update patient - should update and return patient successfully")
     void update_ShouldUpdateAndReturnPatient() {
-        // Given
         Patient updatedDetails = Patient.builder()
                 .firstName("Jane")
                 .lastName("Smith")
@@ -178,10 +162,8 @@ class PatientServiceTest {
         when(patientRepository.findById(1)).thenReturn(Optional.of(testPatient));
         when(patientRepository.save(any(Patient.class))).thenReturn(updatedPatient);
 
-        // When
         Patient result = patientService.update(1, updatedDetails);
 
-        // Then
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals("Jane", result.getFirstName());
@@ -194,7 +176,6 @@ class PatientServiceTest {
     @Test
     @DisplayName("Update patient - should throw exception when patient not found")
     void update_ShouldThrowPatientNotFoundException_WhenPatientNotFound() {
-        // Given
         Patient updatedDetails = Patient.builder()
                 .firstName("Jane")
                 .lastName("Smith")
@@ -202,7 +183,6 @@ class PatientServiceTest {
 
         when(patientRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(PatientNotFroundException.class, () -> patientService.update(999, updatedDetails));
         verify(patientRepository, times(1)).findById(999);
         verify(patientRepository, never()).save(any());
@@ -211,7 +191,6 @@ class PatientServiceTest {
     @Test
     @DisplayName("Update patient - should update only provided fields")
     void update_ShouldUpdateOnlyProvidedFields() {
-        // Given
         Patient updatedDetails = Patient.builder()
                 .firstName("Jane")
                 .lastName("Smith")
@@ -223,10 +202,8 @@ class PatientServiceTest {
         when(patientRepository.findById(1)).thenReturn(Optional.of(testPatient));
         when(patientRepository.save(any(Patient.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // When
         Patient result = patientService.update(1, updatedDetails);
 
-        // Then
         assertNotNull(result);
         assertEquals("Jane", result.getFirstName());
         assertEquals("Smith", result.getLastName());
@@ -237,14 +214,11 @@ class PatientServiceTest {
     @Test
     @DisplayName("Delete patient - should delete patient successfully")
     void delete_ShouldDeletePatient() {
-        // Given
         when(patientRepository.findById(1)).thenReturn(Optional.of(testPatient));
         doNothing().when(patientRepository).delete(testPatient);
 
-        // When
         patientService.delete(1);
 
-        // Then
         verify(patientRepository, times(1)).findById(1);
         verify(patientRepository, times(1)).delete(testPatient);
     }
@@ -252,10 +226,8 @@ class PatientServiceTest {
     @Test
     @DisplayName("Delete patient - should throw exception when patient not found")
     void delete_ShouldThrowPatientNotFoundException_WhenPatientNotFound() {
-        // Given
         when(patientRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(PatientNotFroundException.class, () -> patientService.delete(999));
         verify(patientRepository, times(1)).findById(999);
         verify(patientRepository, never()).delete(any());
@@ -264,7 +236,6 @@ class PatientServiceTest {
     @Test
     @DisplayName("Create patient - should handle patient with all fields")
     void create_ShouldHandlePatientWithAllFields() {
-        // Given
         Patient fullPatient = Patient.builder()
                 .firstName("John")
                 .lastName("Doe")
@@ -276,10 +247,8 @@ class PatientServiceTest {
 
         when(patientRepository.save(any(Patient.class))).thenReturn(testPatient);
 
-        // When
         Patient result = patientService.create(fullPatient);
 
-        // Then
         assertNotNull(result);
         assertEquals("John", result.getFirstName());
         assertEquals("Doe", result.getLastName());

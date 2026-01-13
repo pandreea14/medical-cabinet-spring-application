@@ -40,13 +40,10 @@ class SpecializationServiceTest {
     @Test
     @DisplayName("Create specialization successfully")
     void create_ShouldSaveAndReturnSpecialization() {
-        // Given
         when(specializationRepository.save(any(Specialization.class))).thenReturn(testSpecialization);
 
-        // When
         Specialization result = specializationService.create(testSpecialization);
 
-        // Then
         assertNotNull(result);
         assertEquals(testSpecialization.getId(), result.getId());
         assertEquals(testSpecialization.getName(), result.getName());
@@ -56,7 +53,6 @@ class SpecializationServiceTest {
     @Test
     @DisplayName("Create specialization with null should throw IllegalArgumentException")
     void create_WithNull_ShouldThrowException() {
-        // When & Then
         assertThrows(IllegalArgumentException.class, () -> specializationService.create(null));
         verify(specializationRepository, never()).save(any());
     }
@@ -64,14 +60,11 @@ class SpecializationServiceTest {
     @Test
     @DisplayName("Get all specializations successfully")
     void getAll_ShouldReturnAllSpecializations() {
-        // Given
         List<Specialization> specializations = Arrays.asList(testSpecialization);
         when(specializationRepository.findAll()).thenReturn(specializations);
 
-        // When
         List<Specialization> result = specializationService.getAll();
 
-        // Then
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(testSpecialization.getId(), result.get(0).getId());
@@ -81,13 +74,10 @@ class SpecializationServiceTest {
     @Test
     @DisplayName("Get specialization by ID successfully")
     void getById_ShouldReturnSpecialization() {
-        // Given
         when(specializationRepository.findById(1)).thenReturn(Optional.of(testSpecialization));
 
-        // When
         Specialization result = specializationService.getById(1);
 
-        // Then
         assertNotNull(result);
         assertEquals(testSpecialization.getId(), result.getId());
         assertEquals(testSpecialization.getName(), result.getName());
@@ -97,10 +87,8 @@ class SpecializationServiceTest {
     @Test
     @DisplayName("Get specialization by ID not found should throw exception")
     void getById_NotFound_ShouldThrowException() {
-        // Given
         when(specializationRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(SpecializationNotFoundException.class, () -> specializationService.getById(999));
         verify(specializationRepository, times(1)).findById(999);
     }
@@ -108,14 +96,11 @@ class SpecializationServiceTest {
     @Test
     @DisplayName("Delete specialization successfully")
     void delete_ShouldDeleteSpecialization() {
-        // Given
         when(specializationRepository.findById(1)).thenReturn(Optional.of(testSpecialization));
         doNothing().when(specializationRepository).delete(testSpecialization);
 
-        // When
         specializationService.delete(1);
 
-        // Then
         verify(specializationRepository, times(1)).findById(1);
         verify(specializationRepository, times(1)).delete(testSpecialization);
     }
@@ -123,10 +108,8 @@ class SpecializationServiceTest {
     @Test
     @DisplayName("Delete non-existent specialization should throw exception")
     void delete_NotFound_ShouldThrowException() {
-        // Given
         when(specializationRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(SpecializationNotFoundException.class, () -> specializationService.delete(999));
         verify(specializationRepository, times(1)).findById(999);
         verify(specializationRepository, never()).delete(any());

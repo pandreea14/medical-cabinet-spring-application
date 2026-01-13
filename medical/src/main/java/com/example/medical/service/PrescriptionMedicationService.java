@@ -1,6 +1,7 @@
 package com.example.medical.service;
 
 import com.example.medical.exceptions.EntityNotFoundException;
+import com.example.medical.exceptions.PrescriptionMedicationEntryNotFoundException;
 import com.example.medical.model.PrescriptionMedication;
 import com.example.medical.repository.PrescriptionMedicationRepository;
 import jakarta.transaction.Transactional;
@@ -15,7 +16,7 @@ public class PrescriptionMedicationService {
 
     public void updateDosage(Integer id, String dosage) {
         PrescriptionMedication pm = prescriptionMedicationRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Prescription-Medication link not found"));
+                .orElseThrow(() -> new PrescriptionMedicationEntryNotFoundException(id));
         pm.setDosage(dosage);
         prescriptionMedicationRepository.save(pm);
     }

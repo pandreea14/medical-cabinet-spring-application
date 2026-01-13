@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -688,6 +689,22 @@ public class MedicalServiceController {
 
     @Tag(name = "Medications", description = "Medications management endpoints")
     @GetMapping("/medications")
+    @Operation(
+            summary = "Get all medications registered",
+            description = "Retrieves a list of all medications available in the system"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Medication entries retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MedicationDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Medications not found",
+                    content = @Content
+            )
+    })
     public ResponseEntity<List<MedicationDto>> getAllMedications() {
         List<Medication> medications = medicationService.getAll();
         List<MedicationDto> medicationDtos = new ArrayList<>();
@@ -699,7 +716,24 @@ public class MedicalServiceController {
 
     @Tag(name = "Medications", description = "Medications management endpoints")
     @PostMapping("/medications")
-    public ResponseEntity<MedicationDto> createMedication(@Valid @RequestBody MedicationDto medicationDto) {
+    @Operation(
+            summary = "Create a new medication",
+            description = "Registers a new medication in the system with name and description details"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Medication created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Invalid medication data provided",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<MedicationDto> createMedication(
+            @Parameter (description = "Medication details", required = true)
+            @Valid @RequestBody MedicationDto medicationDto) {
         Medication medication = mapper.toMedication(medicationDto);
         Medication savedMedication = medicationService.create(medication);
         return new ResponseEntity<>(mapper.toMedicationDto(savedMedication), HttpStatus.CREATED);
@@ -707,7 +741,24 @@ public class MedicalServiceController {
 
     @Tag(name = "Medications", description = "Medications management endpoints")
     @DeleteMapping("/medications/{id}")
-    public ResponseEntity<Void> deleteMedication(@PathVariable Integer id) {
+    @Operation(
+            summary = "Remove medication",
+            description = "Removes a specific medication from the system"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Medication removed successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Medication not found",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<Void> deleteMedication(
+            @Parameter (description = "ID of the medication to delete", required = true)
+            @PathVariable Integer id) {
         try {
             medicationService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -718,6 +769,22 @@ public class MedicalServiceController {
 
     @Tag(name = "Specializations", description = "Medical Specializations management endpoints")
     @GetMapping("/specializations")
+    @Operation(
+            summary = "Get all medical specializations",
+            description = "Retrieves a list of all medical specializations available in the system"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Specializations retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = SpecializationDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Specializations not found",
+                    content = @Content
+            )
+    })
     public ResponseEntity<List<SpecializationDto>> getAllSpecializations() {
         List<Specialization> specializations = specializationService.getAll();
         List<SpecializationDto> specializationDtos = new ArrayList<>();
@@ -729,7 +796,24 @@ public class MedicalServiceController {
 
     @Tag(name = "Specializations", description = "Medical Specializations management endpoints")
     @PostMapping("/specializations")
-    public ResponseEntity<SpecializationDto> createSpecialization(@Valid @RequestBody SpecializationDto specializationDto) {
+    @Operation(
+            summary = "Create a new medical specialization",
+            description = "Registers a new medical specialization in the system"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Specialization created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Invalid specialization data provided",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<SpecializationDto> createSpecialization(
+            @Parameter (description = "Specialization details", required = true)
+            @Valid @RequestBody SpecializationDto specializationDto) {
         Specialization specialization = mapper.toSpecialization(specializationDto);
         Specialization savedSpecialization = specializationService.create(specialization);
         return new ResponseEntity<>(mapper.toSpecializationDto(savedSpecialization), HttpStatus.CREATED);
@@ -737,7 +821,24 @@ public class MedicalServiceController {
 
     @Tag(name = "Specializations", description = "Medical Specializations management endpoints")
     @DeleteMapping("/specializations/{id}")
-    public ResponseEntity<Void> deleteSpecialization(@PathVariable Integer id) {
+    @Operation(
+            summary = "Remove specialization from the system",
+            description = "Removes a specific specialization entry from the system"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Specialization removed successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Specialization not found",
+                    content = @Content
+            )
+    })
+    public ResponseEntity<Void> deleteSpecialization(
+            @Parameter (description = "ID of the specialization to delete", required = true)
+            @PathVariable Integer id) {
         try {
             specializationService.delete(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

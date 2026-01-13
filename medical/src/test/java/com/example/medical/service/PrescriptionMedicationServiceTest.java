@@ -69,11 +69,11 @@ class PrescriptionMedicationServiceTest {
         when(prescriptionMedicationRepository.save(any(PrescriptionMedication.class)))
                 .thenReturn(testPrescriptionMedication);
 
-        prescriptionMedicationService.updateDosage(1, "3 tablets daily");
+        prescriptionMedicationService.updateDosage(1, "3 pe zi");
 
         verify(prescriptionMedicationRepository, times(1)).findById(1);
         verify(prescriptionMedicationRepository, times(1)).save(testPrescriptionMedication);
-        assertThat(testPrescriptionMedication.getDosage()).isEqualTo("3 tablets daily");
+        assertThat(testPrescriptionMedication.getDosage()).isEqualTo("3 pe zi");
     }
 
     @Test

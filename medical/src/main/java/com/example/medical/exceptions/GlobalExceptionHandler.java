@@ -19,7 +19,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(EntityNotFoundException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.NOT_FOUND.value());
         errorResponse.put("error", "Not Found");
         errorResponse.put("message", ex.getMessage());
@@ -29,7 +28,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SpecializationNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleSpecializationNotFoundException(SpecializationNotFoundException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.NOT_FOUND.value());
         errorResponse.put("error", "Specialization Not Found");
         errorResponse.put("message", ex.getMessage());
@@ -39,7 +37,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DoctorNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleDoctorNotFoundException(DoctorNotFoundException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.NOT_FOUND.value());
         errorResponse.put("error", "Doctor Not Found");
         errorResponse.put("message", ex.getMessage());
@@ -49,7 +46,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PatientNotFroundException.class)
     public ResponseEntity<Map<String, Object>> handlePatientNotFoundException(PatientNotFroundException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.NOT_FOUND.value());
         errorResponse.put("error", "Patient Not Found");
         errorResponse.put("message", ex.getMessage());
@@ -59,7 +55,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AppointmentNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleAppointmentNotFoundException(AppointmentNotFoundException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.NOT_FOUND.value());
         errorResponse.put("error", "Appointment Not Found");
         errorResponse.put("message", ex.getMessage());
@@ -69,7 +64,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MedicationNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleMedicationNotFoundException(MedicationNotFoundException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.NOT_FOUND.value());
         errorResponse.put("error", "Medication Not Found");
         errorResponse.put("message", ex.getMessage());
@@ -79,7 +73,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PrescriptionNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handlePrescriptionNotFoundException(PrescriptionNotFoundException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.NOT_FOUND.value());
         errorResponse.put("error", "Prescription Not Found");
         errorResponse.put("message", ex.getMessage());
@@ -89,9 +82,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoAppointmentsForPatientException.class)
     public ResponseEntity<Map<String, Object>> handleNoAppointmentsForPatientException(NoAppointmentsForPatientException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.NOT_FOUND.value());
         errorResponse.put("error", "No Appointments Found");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(NoAppointmentsForDoctorException.class)
+    public ResponseEntity<Map<String, Object>> handleNoAppointmentForDoctorException(NoAppointmentsForDoctorException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("status", HttpStatus.NOT_FOUND.value());
+        errorResponse.put("error", "No Appointments Found for Doctor");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(PrescriptionMedicationEntryNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handlePrescriptionMedicationEntryNotFoundException(PrescriptionMedicationEntryNotFoundException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("status", HttpStatus.NOT_FOUND.value());
+        errorResponse.put("error", "No prescription-medication Link Found");
         errorResponse.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
@@ -99,7 +109,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
         errorResponse.put("error", "Bad Request");
         errorResponse.put("message", ex.getMessage());
@@ -116,7 +125,6 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
 
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
         errorResponse.put("error", "Validation Failed");
         errorResponse.put("message", errorMessage);
@@ -126,7 +134,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("timestamp", LocalDateTime.now());
         errorResponse.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         errorResponse.put("error", "Internal Server Error");
         errorResponse.put("message", ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred");

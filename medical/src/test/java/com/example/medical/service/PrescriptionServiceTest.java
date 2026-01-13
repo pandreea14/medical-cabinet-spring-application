@@ -66,14 +66,11 @@ class PrescriptionServiceTest {
     @Test
     @DisplayName("Create prescription successfully")
     void create_ShouldSaveAndReturnPrescription() {
-        // Given
         when(appointmentService.getById(1)).thenReturn(testAppointment);
         when(prescriptionRepository.save(any(Prescription.class))).thenReturn(testPrescription);
 
-        // When
         Prescription result = prescriptionService.create(1, "Take with food");
 
-        // Then
         assertNotNull(result);
         assertEquals(testPrescription.getId(), result.getId());
         assertEquals(testPrescription.getInstructions(), result.getInstructions());
@@ -84,14 +81,11 @@ class PrescriptionServiceTest {
     @Test
     @DisplayName("Create prescription with null instructions should work")
     void create_WithNullInstructions_ShouldWork() {
-        // Given
         when(appointmentService.getById(1)).thenReturn(testAppointment);
         when(prescriptionRepository.save(any(Prescription.class))).thenReturn(testPrescription);
 
-        // When
         Prescription result = prescriptionService.create(1, null);
 
-        // Then
         assertNotNull(result);
         verify(appointmentService, times(1)).getById(1);
         verify(prescriptionRepository, times(1)).save(any(Prescription.class));
@@ -100,13 +94,10 @@ class PrescriptionServiceTest {
     @Test
     @DisplayName("Get prescription by ID successfully")
     void getById_ShouldReturnPrescription() {
-        // Given
         when(prescriptionRepository.findById(1)).thenReturn(Optional.of(testPrescription));
 
-        // When
         Prescription result = prescriptionService.getById(1);
 
-        // Then
         assertNotNull(result);
         assertEquals(testPrescription.getId(), result.getId());
         verify(prescriptionRepository, times(1)).findById(1);
@@ -115,10 +106,8 @@ class PrescriptionServiceTest {
     @Test
     @DisplayName("Get prescription by ID not found should throw exception")
     void getById_NotFound_ShouldThrowException() {
-        // Given
         when(prescriptionRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(PrescriptionNotFoundException.class, () -> prescriptionService.getById(999));
         verify(prescriptionRepository, times(1)).findById(999);
     }
@@ -126,15 +115,12 @@ class PrescriptionServiceTest {
     @Test
     @DisplayName("Add medication to prescription successfully")
     void addMedication_ShouldAddAndReturnPrescription() {
-        // Given
         when(prescriptionRepository.findById(1)).thenReturn(Optional.of(testPrescription));
         when(medicationRepository.findById(1)).thenReturn(Optional.of(testMedication));
         when(prescriptionRepository.save(any(Prescription.class))).thenReturn(testPrescription);
 
-        // When
         Prescription result = prescriptionService.addMedication(1, 1, "2 pills daily");
 
-        // Then
         assertNotNull(result);
         verify(prescriptionRepository, times(1)).findById(1);
         verify(medicationRepository, times(1)).findById(1);
@@ -144,10 +130,8 @@ class PrescriptionServiceTest {
     @Test
     @DisplayName("Add medication to non-existent prescription should throw exception")
     void addMedication_PrescriptionNotFound_ShouldThrowException() {
-        // Given
         when(prescriptionRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(PrescriptionNotFoundException.class,
                 () -> prescriptionService.addMedication(999, 1, "2 pills daily"));
         verify(prescriptionRepository, times(1)).findById(999);
@@ -158,11 +142,9 @@ class PrescriptionServiceTest {
     @Test
     @DisplayName("Add non-existent medication to prescription should throw exception")
     void addMedication_MedicationNotFound_ShouldThrowException() {
-        // Given
         when(prescriptionRepository.findById(1)).thenReturn(Optional.of(testPrescription));
         when(medicationRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(MedicationNotFoundException.class,
                 () -> prescriptionService.addMedication(1, 999, "2 pills daily"));
         verify(prescriptionRepository, times(1)).findById(1);

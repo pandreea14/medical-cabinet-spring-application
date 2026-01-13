@@ -83,14 +83,11 @@ class MedicationServiceTest {
     @Test
     @DisplayName("Delete medication successfully")
     void delete_ShouldDeleteMedication() {
-        // Given
         when(medicationRepository.findById(1)).thenReturn(Optional.of(testMedication));
         doNothing().when(medicationRepository).delete(testMedication);
 
-        // When
         medicationService.delete(1);
 
-        // Then
         verify(medicationRepository, times(1)).findById(1);
         verify(medicationRepository, times(1)).delete(testMedication);
     }
@@ -98,10 +95,8 @@ class MedicationServiceTest {
     @Test
     @DisplayName("Delete non-existent medication should throw exception")
     void delete_NotFound_ShouldThrowException() {
-        // Given
         when(medicationRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(MedicationNotFoundException.class, () -> medicationService.delete(999));
         verify(medicationRepository, times(1)).findById(999);
         verify(medicationRepository, never()).delete(any());

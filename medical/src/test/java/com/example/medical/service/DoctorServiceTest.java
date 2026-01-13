@@ -56,14 +56,11 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Create doctor successfully")
     void create_ShouldSaveAndReturnDoctor() {
-        // Given
         when(specializationRepository.findByName("Cardiology")).thenReturn(Optional.of(testSpecialization));
         when(doctorRepository.save(any(Doctor.class))).thenReturn(testDoctor);
 
-        // When
         Doctor result = doctorService.create(testDoctor);
 
-        // Then
         assertNotNull(result);
         assertEquals(testDoctor.getId(), result.getId());
         assertEquals(testDoctor.getFirstName(), result.getFirstName());
@@ -74,45 +71,13 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Create doctor with null should throw IllegalArgumentException")
     void create_WithNull_ShouldThrowException() {
-        // When & Then
         assertThrows(IllegalArgumentException.class, () -> doctorService.create(null));
-        verify(doctorRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Create doctor with null name should throw IllegalArgumentException")
-    void create_WithNullName_ShouldThrowException() {
-        // Given
-        Doctor doctor = Doctor.builder()
-                .firstName(null)
-                .email("test@example.com")
-                .specialization(testSpecialization)
-                .build();
-
-        // When & Then
-        assertThrows(IllegalArgumentException.class, () -> doctorService.create(doctor));
-        verify(doctorRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Create doctor with null email should throw IllegalArgumentException")
-    void create_WithNullEmail_ShouldThrowException() {
-        // Given
-        Doctor doctor = Doctor.builder()
-                .firstName("Dr. Jane")
-                .email(null)
-                .specialization(testSpecialization)
-                .build();
-
-        // When & Then
-        assertThrows(IllegalArgumentException.class, () -> doctorService.create(doctor));
         verify(doctorRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("Create doctor with non-existent specialization should throw SpecializationNotFoundException")
     void create_WithNonExistentSpecialization_ShouldThrowException() {
-        // Given
         when(specializationRepository.findByName("NonExistent")).thenReturn(Optional.empty());
 
         Specialization nonExistent = new Specialization();
@@ -124,7 +89,6 @@ class DoctorServiceTest {
                 .specialization(nonExistent)
                 .build();
 
-        // When & Then
         assertThrows(SpecializationNotFoundException.class, () -> doctorService.create(doctor));
         verify(doctorRepository, never()).save(any());
     }
@@ -132,14 +96,11 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Get all doctors successfully")
     void getAll_ShouldReturnAllDoctors() {
-        // Given
         List<Doctor> doctors = Arrays.asList(testDoctor);
         when(doctorRepository.findAll()).thenReturn(doctors);
 
-        // When
         List<Doctor> result = doctorService.getAll();
 
-        // Then
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(testDoctor.getId(), result.get(0).getId());
@@ -149,13 +110,10 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Get doctor by ID successfully")
     void getById_ShouldReturnDoctor() {
-        // Given
         when(doctorRepository.findById(1)).thenReturn(Optional.of(testDoctor));
 
-        // When
         Doctor result = doctorService.getById(1);
 
-        // Then
         assertNotNull(result);
         assertEquals(testDoctor.getId(), result.getId());
         assertEquals(testDoctor.getFirstName(), result.getFirstName());
@@ -165,10 +123,8 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Get doctor by ID not found should throw exception")
     void getById_NotFound_ShouldThrowException() {
-        // Given
         when(doctorRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(DoctorNotFoundException.class, () -> doctorService.getById(999));
         verify(doctorRepository, times(1)).findById(999);
     }
@@ -176,14 +132,11 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Get doctors by specialization successfully")
     void getBySpecialization_ShouldReturnDoctors() {
-        // Given
         List<Doctor> doctors = Arrays.asList(testDoctor);
         when(doctorRepository.findBySpecializationId(1)).thenReturn(doctors);
 
-        // When
         List<Doctor> result = doctorService.getBySpecialization(1);
 
-        // Then
         assertNotNull(result);
         assertEquals(1, result.size());
         verify(doctorRepository, times(1)).findBySpecializationId(1);
@@ -192,7 +145,6 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Update doctor successfully")
     void update_ShouldUpdateAndReturnDoctor() {
-        // Given
         Doctor updatedDetails = Doctor.builder()
                 .firstName("Dr. John")
                 .lastName("Updated")
@@ -205,10 +157,8 @@ class DoctorServiceTest {
         when(specializationRepository.findByName("Cardiology")).thenReturn(Optional.of(testSpecialization));
         when(doctorRepository.save(any(Doctor.class))).thenReturn(testDoctor);
 
-        // When
         Doctor result = doctorService.update(1, updatedDetails);
 
-        // Then
         assertNotNull(result);
         verify(doctorRepository, times(1)).findById(1);
         verify(specializationRepository, times(1)).findByName("Cardiology");
@@ -218,7 +168,6 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Update doctor with non-existent specialization should throw exception")
     void update_WithNonExistentSpecialization_ShouldThrowException() {
-        // Given
         Specialization nonExistent = new Specialization();
         nonExistent.setName("NonExistent");
 
@@ -230,7 +179,6 @@ class DoctorServiceTest {
         when(doctorRepository.findById(1)).thenReturn(Optional.of(testDoctor));
         when(specializationRepository.findByName("NonExistent")).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(SpecializationNotFoundException.class, () -> doctorService.update(1, updatedDetails));
         verify(doctorRepository, times(1)).findById(1);
         verify(doctorRepository, never()).save(any());
@@ -239,14 +187,11 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Delete doctor successfully")
     void delete_ShouldDeleteDoctor() {
-        // Given
         when(doctorRepository.findById(1)).thenReturn(Optional.of(testDoctor));
         doNothing().when(doctorRepository).delete(testDoctor);
 
-        // When
         doctorService.delete(1);
 
-        // Then
         verify(doctorRepository, times(1)).findById(1);
         verify(doctorRepository, times(1)).delete(testDoctor);
     }
@@ -254,10 +199,8 @@ class DoctorServiceTest {
     @Test
     @DisplayName("Delete non-existent doctor should throw exception")
     void delete_NotFound_ShouldThrowException() {
-        // Given
         when(doctorRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(DoctorNotFoundException.class, () -> doctorService.delete(999));
         verify(doctorRepository, times(1)).findById(999);
         verify(doctorRepository, never()).delete(any());

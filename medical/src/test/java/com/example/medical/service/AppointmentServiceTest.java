@@ -69,15 +69,12 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Create appointment successfully")
     void create_ShouldSaveAndReturnAppointment() {
-        // Given
         when(patientService.getById(1)).thenReturn(testPatient);
         when(doctorService.getById(1)).thenReturn(testDoctor);
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(testAppointment);
 
-        // When
         Appointment result = appointmentService.create(testAppointment);
 
-        // Then
         assertNotNull(result);
         assertEquals(testAppointment.getId(), result.getId());
         verify(patientService, times(1)).getById(1);
@@ -88,7 +85,6 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Create appointment with null should throw IllegalArgumentException")
     void create_WithNull_ShouldThrowException() {
-        // When & Then
         assertThrows(IllegalArgumentException.class, () -> appointmentService.create(null));
         verify(appointmentRepository, never()).save(any());
     }
@@ -96,13 +92,11 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Create appointment without patient ID should throw IllegalArgumentException")
     void create_WithoutPatientId_ShouldThrowException() {
-        // Given
         Appointment appointment = Appointment.builder()
                 .patient(new Patient())
                 .doctor(testDoctor)
                 .build();
 
-        // When & Then
         assertThrows(IllegalArgumentException.class, () -> appointmentService.create(appointment));
         verify(appointmentRepository, never()).save(any());
     }
@@ -110,13 +104,11 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Create appointment without doctor ID should throw IllegalArgumentException")
     void create_WithoutDoctorId_ShouldThrowException() {
-        // Given
         Appointment appointment = Appointment.builder()
                 .patient(testPatient)
                 .doctor(new Doctor())
                 .build();
 
-        // When & Then
         assertThrows(IllegalArgumentException.class, () -> appointmentService.create(appointment));
         verify(appointmentRepository, never()).save(any());
     }
@@ -124,13 +116,11 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Create appointment with null patient should throw IllegalArgumentException")
     void create_WithNullPatient_ShouldThrowException() {
-        // Given
         Appointment appointment = Appointment.builder()
                 .patient(null)
                 .doctor(testDoctor)
                 .build();
 
-        // When & Then
         assertThrows(IllegalArgumentException.class, () -> appointmentService.create(appointment));
         verify(appointmentRepository, never()).save(any());
     }
@@ -138,13 +128,11 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Create appointment with null doctor should throw IllegalArgumentException")
     void create_WithNullDoctor_ShouldThrowException() {
-        // Given
         Appointment appointment = Appointment.builder()
                 .patient(testPatient)
                 .doctor(null)
                 .build();
 
-        // When & Then
         assertThrows(IllegalArgumentException.class, () -> appointmentService.create(appointment));
         verify(appointmentRepository, never()).save(any());
     }
@@ -152,13 +140,10 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Get appointment by ID successfully")
     void getById_ShouldReturnAppointment() {
-        // Given
         when(appointmentRepository.findById(1)).thenReturn(Optional.of(testAppointment));
 
-        // When
         Appointment result = appointmentService.getById(1);
 
-        // Then
         assertNotNull(result);
         assertEquals(testAppointment.getId(), result.getId());
         verify(appointmentRepository, times(1)).findById(1);
@@ -167,10 +152,8 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Get appointment by ID not found should throw exception")
     void getById_NotFound_ShouldThrowException() {
-        // Given
         when(appointmentRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(AppointmentNotFoundException.class, () -> appointmentService.getById(999));
         verify(appointmentRepository, times(1)).findById(999);
     }
@@ -178,14 +161,11 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Get appointments by patient successfully")
     void getByPatient_ShouldReturnAppointments() {
-        // Given
         List<Appointment> appointments = Arrays.asList(testAppointment);
         when(appointmentRepository.findByPatientId(1)).thenReturn(appointments);
 
-        // When
         List<Appointment> result = appointmentService.getByPatient(1);
 
-        // Then
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(testAppointment.getId(), result.get(0).getId());
@@ -195,14 +175,11 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Get appointments by doctor successfully")
     void getByDoctor_ShouldReturnAppointments() {
-        // Given
         List<Appointment> appointments = Arrays.asList(testAppointment);
         when(appointmentRepository.findByDoctorId(1)).thenReturn(appointments);
 
-        // When
         List<Appointment> result = appointmentService.getByDoctor(1);
 
-        // Then
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(testAppointment.getId(), result.get(0).getId());
@@ -212,14 +189,11 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Delete appointment successfully")
     void delete_ShouldDeleteAppointment() {
-        // Given
         when(appointmentRepository.findById(1)).thenReturn(Optional.of(testAppointment));
         doNothing().when(appointmentRepository).delete(testAppointment);
 
-        // When
         appointmentService.delete(1);
 
-        // Then
         verify(appointmentRepository, times(1)).findById(1);
         verify(appointmentRepository, times(1)).delete(testAppointment);
     }
@@ -227,10 +201,8 @@ class AppointmentServiceTest {
     @Test
     @DisplayName("Delete non-existent appointment should throw exception")
     void delete_NotFound_ShouldThrowException() {
-        // Given
         when(appointmentRepository.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then
         assertThrows(AppointmentNotFoundException.class, () -> appointmentService.delete(999));
         verify(appointmentRepository, times(1)).findById(999);
         verify(appointmentRepository, never()).delete(any());

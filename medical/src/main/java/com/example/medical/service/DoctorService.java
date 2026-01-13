@@ -26,14 +26,6 @@ public class DoctorService {
             throw new IllegalArgumentException("Doctor cannot be null");
         }
 
-        if (doctor.getFirstName() == null || doctor.getFirstName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Doctor name is required");
-        }
-
-        if (doctor.getEmail() == null || doctor.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("Doctor email is required");
-        }
-
         if (doctor.getSpecialization().getName() == null || doctor.getSpecialization().getName().trim().isEmpty()) {
             throw new IllegalArgumentException("Specialization name is required");
         }
@@ -62,10 +54,6 @@ public class DoctorService {
 
     public Doctor update(Integer id, Doctor doctor) {
         Doctor existing = getById(id);
-
-        if (doctor.getSpecialization() == null) {
-            throw new IllegalArgumentException("Specialization is required");
-        }
 
         if (doctor.getSpecialization().getName() == null || doctor.getSpecialization().getName().trim().isEmpty()) {
             throw new IllegalArgumentException("Specialization name is required");
