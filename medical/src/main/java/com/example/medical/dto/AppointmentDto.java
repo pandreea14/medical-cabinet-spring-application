@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +18,7 @@ import java.time.LocalDateTime;
 public class AppointmentDto {
     private Integer id;
 
-    @JsonIgnore
+    @NotNull(message = "Patient is required")
     private PatientDto patient;
 
     @NotNull(message = "Doctor is required")
@@ -31,6 +33,6 @@ public class AppointmentDto {
     private String reason;
 
     @JsonIgnore
-    private PrescriptionDto prescription;
+    private List<PrescriptionDto> prescriptions = new ArrayList<>();
 }
 

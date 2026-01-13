@@ -1,5 +1,7 @@
 package com.example.medical.service;
 
+import com.example.medical.exceptions.EntityNotFoundException;
+import com.example.medical.exceptions.MedicationNotFoundException;
 import com.example.medical.model.Medication;
 import com.example.medical.repository.MedicationRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,10 @@ public class MedicationService {
 
     public Medication getById(Integer id) {
         return medicationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Medication not found: " + id));
+                .orElseThrow(() -> new MedicationNotFoundException(id));
+    }
+
+    public void delete(Integer id) {
+        medicationRepository.delete(getById(id));
     }
 }

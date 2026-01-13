@@ -1,5 +1,6 @@
 package com.example.medical.service;
 
+import com.example.medical.exceptions.SpecializationNotFoundException;
 import com.example.medical.model.Specialization;
 import com.example.medical.repository.SpecializationRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,10 @@ public class SpecializationService {
 
     public Specialization getById(Integer id) {
         return specializationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Specialization not found: " + id));
+                .orElseThrow(() -> new SpecializationNotFoundException(id));
+    }
+
+    public void delete(Integer id) {
+        specializationRepository.delete(getById(id));
     }
 }

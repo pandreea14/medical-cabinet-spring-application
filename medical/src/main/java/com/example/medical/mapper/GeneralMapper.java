@@ -2,6 +2,7 @@ package com.example.medical.mapper;
 
 import com.example.medical.dto.*;
 import com.example.medical.model.*;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,9 +12,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class GeneralMapper {
-
-    // ========== Patient Mappings ==========
-
     public PatientDto toPatientDto(Patient patient) {
         if (patient == null) return null;
 
@@ -24,11 +22,7 @@ public class GeneralMapper {
                 .cnp(patient.getCnp())
                 .email(patient.getEmail())
                 .phone(patient.getPhone())
-                .appointments(patient.getAppointments() != null
-                    ? patient.getAppointments().stream()
-                        .map(this::toAppointmentDtoWithoutPatient)
-                        .collect(Collectors.toList())
-                    : new ArrayList<>())
+                .appointments(new ArrayList<>())
                 .build();
     }
 
@@ -45,8 +39,6 @@ public class GeneralMapper {
                 .build();
     }
 
-    // ========== Doctor Mappings ==========
-
     public DoctorDto toDoctorDto(Doctor doctor) {
         if (doctor == null) return null;
 
@@ -57,7 +49,7 @@ public class GeneralMapper {
                 .email(doctor.getEmail())
                 .phone(doctor.getPhone())
                 .specialization(doctor.getSpecialization() != null ? doctor.getSpecialization().getName() : null)
-                .appointments(new ArrayList<>()) // Empty to avoid circular reference
+                .appointments(new ArrayList<>())
                 .build();
     }
 
@@ -71,9 +63,7 @@ public class GeneralMapper {
         doctor.setEmail(doctorDto.getEmail());
         doctor.setPhone(doctorDto.getPhone());
 
-        // Create a Specialization object with just the name
-        // The service layer will need to validate/fetch the actual specialization
-        if (doctorDto.getSpecialization() != null) {
+        if (doctorDto.getSpecialization() != null && !doctorDto.getSpecialization().trim().isEmpty()) {
             Specialization specialization = new Specialization();
             specialization.setName(doctorDto.getSpecialization());
             doctor.setSpecialization(specialization);
@@ -82,67 +72,30 @@ public class GeneralMapper {
         return doctor;
     }
 
-    // ========== Specialization Mappings ==========
-
-    public SpecializationDto toSpecializationDto(Specialization specialization) {
-        if (specialization == null) return null;
-
-        return SpecializationDto.builder()
-                .id(specialization.getId())
-                .name(specialization.getName())
-                .doctors(specialization.getDoctors() != null
-                    ? specialization.getDoctors().stream()
-                        .map(this::toDoctorDto)
-                        .collect(Collectors.toList())
-                    : new ArrayList<>())
-                .build();
-    }
-
-    public SpecializationDto toSpecializationDtoWithoutDoctors(Specialization specialization) {
-        if (specialization == null) return null;
-
-        return SpecializationDto.builder()
-                .id(specialization.getId())
-                .name(specialization.getName())
-                .doctors(new ArrayList<>())
-                .build();
-    }
-
-    public Specialization toSpecialization(SpecializationDto dto) {
-        if (dto == null) return null;
-
-        Specialization specialization = new Specialization();
-        specialization.setId(dto.getId());
-        specialization.setName(dto.getName());
-        return specialization;
-    }
-
-    // ========== Appointment Mappings ==========
-
     public AppointmentDto toAppointmentDto(Appointment appointment) {
         if (appointment == null) return null;
 
-        return AppointmentDto.builder()
-                .id(appointment.getId())
-                .patient(toPatientDto(appointment.getPatient()))
-                .doctor(toDoctorDto(appointment.getDoctor()))
-                .appointmentDate(appointment.getAppointmentDate())
-                .reason(appointment.getReason())
-                .prescription(toPrescriptionDtoWithoutAppointment(appointment.getPrescription()))
-                .build();
-    }
-
-    // Version without patient to break circular reference
-    private AppointmentDto toAppointmentDtoWithoutPatient(Appointment appointment) {
-        if (appointment == null) return null;
+        PatientDto patientDto = appointment.getPatient() != null ? PatientDto.builder()
+                .id(appointment.getPatient().getId())
+                .firstName(appointment.getPatient().getFirstName())
+                .lastName(appointment.getPatient().getLastName())
+                .cnp(appointment.getPatient().getCnp())
+                .email(appointment.getPatient().getEmail())
+                .phone(appointment.getPatient().getPhone())
+                .appointments(new ArrayList<>())
+                .build() : null;
 
         return AppointmentDto.builder()
                 .id(appointment.getId())
-                .patient(null) // Break circular reference
+                .patient(patientDto)
                 .doctor(toDoctorDto(appointment.getDoctor()))
                 .appointmentDate(appointment.getAppointmentDate())
                 .reason(appointment.getReason())
-                .prescription(toPrescriptionDtoWithoutAppointment(appointment.getPrescription()))
+                .prescriptions(appointment.getPrescriptions() != null
+                        ? appointment.getPrescriptions().stream()
+                        .map(this::toPrescriptionDtoWithoutAppointment)
+                        .collect(Collectors.toList())
+                        : new ArrayList<>())
                 .build();
     }
 
@@ -153,10 +106,21 @@ public class GeneralMapper {
         appointment.setId(dto.getId());
         appointment.setAppointmentDate(dto.getAppointmentDate());
         appointment.setReason(dto.getReason());
+
+        if (dto.getPatient() != null && dto.getPatient().getId() != null) {
+            Patient patient = new Patient();
+            patient.setId(dto.getPatient().getId());
+            appointment.setPatient(patient);
+        }
+
+        if (dto.getDoctor() != null && dto.getDoctor().getId() != null) {
+            Doctor doctor = new Doctor();
+            doctor.setId(dto.getDoctor().getId());
+            appointment.setDoctor(doctor);
+        }
+
         return appointment;
     }
-
-    // ========== Prescription Mappings ==========
 
     public PrescriptionDto toPrescriptionDto(Prescription prescription) {
         if (prescription == null) return null;
@@ -166,14 +130,13 @@ public class GeneralMapper {
                 .issuedDate(prescription.getIssuedDate())
                 .instructions(prescription.getInstructions())
                 .medications(prescription.getMedications() != null
-                    ? prescription.getMedications().stream()
+                        ? prescription.getMedications().stream()
                         .map(this::toPrescriptionMedicationDto)
                         .collect(Collectors.toList())
-                    : new ArrayList<>())
+                        : new ArrayList<>())
                 .build();
     }
 
-    // Version without appointment to break circular reference
     private PrescriptionDto toPrescriptionDtoWithoutAppointment(Prescription prescription) {
         if (prescription == null) return null;
 
@@ -182,24 +145,12 @@ public class GeneralMapper {
                 .issuedDate(prescription.getIssuedDate())
                 .instructions(prescription.getInstructions())
                 .medications(prescription.getMedications() != null
-                    ? prescription.getMedications().stream()
+                        ? prescription.getMedications().stream()
                         .map(this::toPrescriptionMedicationDtoWithoutPrescription)
                         .collect(Collectors.toList())
-                    : new ArrayList<>())
+                        : new ArrayList<>())
                 .build();
     }
-
-    public Prescription toPrescription(PrescriptionDto dto) {
-        if (dto == null) return null;
-
-        Prescription prescription = new Prescription();
-        prescription.setId(dto.getId());
-        prescription.setIssuedDate(dto.getIssuedDate());
-        prescription.setInstructions(dto.getInstructions());
-        return prescription;
-    }
-
-    // ========== Medication Mappings ==========
 
     public MedicationDto toMedicationDto(Medication medication) {
         if (medication == null) return null;
@@ -211,29 +162,16 @@ public class GeneralMapper {
                 .build();
     }
 
-    public Medication toMedication(MedicationDto dto) {
-        if (dto == null) return null;
-
-        Medication medication = new Medication();
-        medication.setId(dto.getId());
-        medication.setName(dto.getName());
-        medication.setDescription(dto.getDescription());
-        return medication;
-    }
-
-    // ========== PrescriptionMedication Mappings ==========
-
     public PrescriptionMedicationDto toPrescriptionMedicationDto(PrescriptionMedication pm) {
         if (pm == null) return null;
 
         return PrescriptionMedicationDto.builder()
                 .medication(toMedicationDto(pm.getMedication()))
                 .dosage(pm.getDosage())
-                .prescription(null) // Break circular reference
+                .prescription(null)
                 .build();
     }
 
-    // Version without prescription to break circular reference
     private PrescriptionMedicationDto toPrescriptionMedicationDtoWithoutPrescription(PrescriptionMedication pm) {
         if (pm == null) return null;
 
@@ -244,12 +182,34 @@ public class GeneralMapper {
                 .build();
     }
 
-    public PrescriptionMedication toPrescriptionMedication(PrescriptionMedicationDto dto) {
-        if (dto == null) return null;
+    public Medication toMedication(@Valid MedicationDto medicationDto) {
+        if (medicationDto == null) return null;
 
-        PrescriptionMedication pm = new PrescriptionMedication();
-        pm.setDosage(dto.getDosage());
-        return pm;
+        return Medication.builder()
+                .id(medicationDto.getId())
+                .name(medicationDto.getName())
+                .description(medicationDto.getDescription())
+                .build();
+    }
+
+
+    public SpecializationDto toSpecializationDto(Specialization specialization) {
+        if (specialization == null) return null;
+
+        return SpecializationDto.builder()
+                .id(specialization.getId())
+                .name(specialization.getName())
+                .build();
+    }
+
+
+    public Specialization toSpecialization(@Valid SpecializationDto specializationDto) {
+        if (specializationDto == null) return null;
+
+        return Specialization.builder()
+                .id(specializationDto.getId())
+                .name(specializationDto.getName())
+                .build();
     }
 }
 

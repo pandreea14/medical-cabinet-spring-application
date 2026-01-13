@@ -1,5 +1,8 @@
 package com.example.medical.service;
 
+import com.example.medical.exceptions.EntityNotFoundException;
+import com.example.medical.exceptions.MedicationNotFoundException;
+import com.example.medical.exceptions.PrescriptionNotFoundException;
 import com.example.medical.model.*;
 import com.example.medical.repository.MedicationRepository;
 import com.example.medical.repository.PrescriptionRepository;
@@ -28,7 +31,7 @@ public class PrescriptionService {
 
     public Prescription getById(Integer id) {
         return prescriptionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Prescription not found"));
+                .orElseThrow(() -> new PrescriptionNotFoundException(id));
     }
 
     public Prescription addMedication(
@@ -37,10 +40,10 @@ public class PrescriptionService {
             String dosage
     ) {
         Prescription prescription = prescriptionRepository.findById(prescriptionId)
-                .orElseThrow(() -> new IllegalArgumentException("Prescription not found"));
+                .orElseThrow(() -> new PrescriptionNotFoundException(prescriptionId));
 
         Medication medication = medicationRepository.findById(medicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Medication not found"));
+                .orElseThrow(() -> new MedicationNotFoundException(medicationId));
 
         PrescriptionMedication pm = new PrescriptionMedication();
         pm.setPrescription(prescription);

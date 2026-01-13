@@ -1,13 +1,13 @@
 package com.example.medical.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
-@Getter
 @Entity
-@Table(name = "prescription_medication")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class PrescriptionMedication {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,4 @@ public class PrescriptionMedication {
 
     @Column(length = 100)
     private String dosage;
-
-    public PrescriptionMedication() {
-    }
 }

@@ -1,15 +1,16 @@
 package com.example.medical.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
-@Getter
 @Entity
-@Table(name = "specialization")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Specialization {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,11 +21,4 @@ public class Specialization {
 
     @OneToMany(mappedBy = "specialization", cascade = CascadeType.ALL)
     private List<Doctor> doctors = new ArrayList<>();
-
-    public Specialization() {
-    }
-
-    public Specialization(String name) {
-        this.name = name;
-    }
 }

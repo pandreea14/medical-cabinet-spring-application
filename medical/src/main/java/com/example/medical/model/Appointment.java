@@ -1,14 +1,17 @@
 package com.example.medical.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import java.time.LocalDateTime;
+import lombok.*;
 
-@Setter
-@Getter
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Table(name = "appointment")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +31,6 @@ public class Appointment {
     @Column(columnDefinition = "TEXT")
     private String reason;
 
-    @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL)
-    private Prescription prescription;
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Prescription> prescriptions = new ArrayList<>();
 }

@@ -1,15 +1,16 @@
 package com.example.medical.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
-@Getter
 @Entity
-@Table(name = "doctor")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +29,7 @@ public class Doctor {
     @Column(length = 150)
     private String email;
 
-    @Column(length = 20)
+    @Column(length = 10)
     private String phone;
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)

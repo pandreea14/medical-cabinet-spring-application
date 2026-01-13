@@ -1,5 +1,7 @@
 package com.example.medical.service;
 
+import com.example.medical.exceptions.EntityNotFoundException;
+import com.example.medical.exceptions.PatientNotFroundException;
 import com.example.medical.model.Patient;
 import com.example.medical.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,9 @@ public class PatientService {
     private final PatientRepository patientRepository;
 
     public Patient create(Patient patient) {
-        validate(patient);
+        if (patient == null) {
+            throw new IllegalArgumentException("Patient cannot be null");
+        }
         return patientRepository.save(patient);
     }
 
@@ -26,7 +30,7 @@ public class PatientService {
 
     public Patient getById(Integer id) {
         return patientRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found: " + id));
+                .orElseThrow(() -> new PatientNotFroundException(id));
     }
 
     public Patient update(Integer id, Patient details) {
@@ -43,11 +47,5 @@ public class PatientService {
 
     public void delete(Integer id) {
         patientRepository.delete(getById(id));
-    }
-
-    private void validate(Patient patient) {
-        if (patient == null) {
-            throw new IllegalArgumentException("Patient cannot be null");
-        }
     }
 }

@@ -1,6 +1,11 @@
 package com.example.medical.service;
 
+import com.example.medical.exceptions.AppointmentNotFoundException;
+import com.example.medical.exceptions.DoctorNotFoundException;
+import com.example.medical.exceptions.PatientNotFroundException;
 import com.example.medical.model.Appointment;
+import com.example.medical.model.Doctor;
+import com.example.medical.model.Patient;
 import com.example.medical.repository.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +27,14 @@ public class AppointmentService {
             throw new IllegalArgumentException("Appointment cannot be null");
         }
 
+        if (appointment.getPatient() == null || appointment.getPatient().getId() == null) {
+            throw new IllegalArgumentException("Patient ID is required for appointment");
+        }
+
+        if (appointment.getDoctor() == null || appointment.getDoctor().getId() == null) {
+            throw new IllegalArgumentException("Doctor ID is required for appointment");
+        }
+
         appointment.setPatient(
                 patientService.getById(appointment.getPatient().getId())
         );
@@ -34,7 +47,7 @@ public class AppointmentService {
 
     public Appointment getById(Integer id) {
         return appointmentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Appointment not found: " + id));
+                .orElseThrow(() -> new AppointmentNotFoundException(id));
     }
 
     public List<Appointment> getByPatient(Integer patientId) {
